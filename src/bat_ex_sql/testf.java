@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 
 public class testf extends JFrame implements ActionListener {
+	//MySQL 8.0 以下
 	//控件
 	private JTextArea text_information;
 	private JPasswordField text_pwd;
@@ -29,6 +30,7 @@ public class testf extends JFrame implements ActionListener {
     private JButton button_sql,button_txt,button_start; 
     private JFileChooser fc=new JFileChooser();
 	JFrame frame = new JFrame("提示框");
+	JComboBox cb_type=new JComboBox();
     //变量
     private static List<String> filelist= new ArrayList<String>();
 	//完整的连接语句jdbc:oracle:thin:@localhost:1521:orcl
@@ -64,21 +66,53 @@ public class testf extends JFrame implements ActionListener {
         }
 	}	
 	//连接数据库
-	public Connection getConnection(String url,String user,String pwd){
+	public Connection getConnection(String url,String port,String name,String user,String pwd){
 		Connection conn=null;
 //		System.out.print(url+user+pwd);
 		try{
-			Class.forName("oracle.jdbc.driver.OracleDriver");//加载数据库驱动
-			conn=DriverManager.getConnection(url, user, pwd);
-			if(conn!=null){
-				text_information.setText(text_information.getText()+"\r\n"+"成功连接数据库");
-//				System.out.println("成功连接数据库");
+			switch (cb_type.getSelectedIndex()){
+				case 0://oracle
+					Class.forName("oracle.jdbc.driver.OracleDriver");//加载数据库驱动
+					conn=DriverManager.getConnection("jdbc:oracle:thin:@"+url+":"+port+":"+name, user, pwd);
+					if(conn!=null){
+						text_information.setText(text_information.getText()+"\r\n"+"成功连接数据库");
+//						System.out.println("成功连接数据库");
+					}
+					else
+					{
+						text_information.setText(text_information.getText()+"\r\n"+"未能连接数据库，请检查参数是否正确");
+//						System.out.println("未能连接数据库，请检查参数是否正确");
+					}
+					break;
+				case 1://mysql 8.0版本以下
+				    Class.forName("com.mysql.jdbc.Driver");
+				    conn = DriverManager.getConnection("jdbc:mysql://"+url+":"+port+"/"+name, user, pwd);
+					if(conn!=null){
+						text_information.setText(text_information.getText()+"\r\n"+"成功连接数据库");
+//						System.out.println("成功连接数据库");
+					}
+					else
+					{
+						text_information.setText(text_information.getText()+"\r\n"+"未能连接数据库，请检查参数是否正确");
+//						System.out.println("未能连接数据库，请检查参数是否正确");
+					}
+					break;
+				case 2://mysql 8.0版本以上
+				    Class.forName("com.mysql.cj.jdbc.Driver");
+				    conn = DriverManager.getConnection("jdbc:mysql://"+url+":"+port+"/"+name+"?useSSL=false&serverTimezone=UTC", user, pwd);
+					if(conn!=null){
+						text_information.setText(text_information.getText()+"\r\n"+"成功连接数据库");
+//						System.out.println("成功连接数据库");
+					}
+					else
+					{
+						text_information.setText(text_information.getText()+"\r\n"+"未能连接数据库，请检查参数是否正确");
+//						System.out.println("未能连接数据库，请检查参数是否正确");
+					}
+					break;
+				default : 	
 			}
-			else
-			{
-				text_information.setText(text_information.getText()+"\r\n"+"未能连接数据库，请检查参数是否正确");
-//				System.out.println("未能连接数据库，请检查参数是否正确");
-			}
+			
 		}catch (Exception e){
 			text_information.setText(text_information.getText()+"\r\n"+"未能连接数据库，请检查连接参数是否正确");
 //			e.printStackTrace();
@@ -125,28 +159,32 @@ public class testf extends JFrame implements ActionListener {
 //		frame.add(panelOutput);
 //		frame.getContentPane().setLayout(new FlowLayout(FlowLayout.LEFT));//内容窗格流布局且右对齐
 		//设置登录框
-        this.setBounds(20,20,830,460);
+        this.setBounds(20,20,810,450);
         this.setResizable(false);                          //窗口大小不能改变
 //        this.setBackground(java.awt.Color.lightGray);		//换个皮肤
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);      //单击窗口关闭按钮时，结束程序运行
         this.getContentPane().setLayout(new FlowLayout(FlowLayout.LEFT));//内容窗格流布局且右对齐
         //	各个控件
+        cb_type.addItem("oracle");
+        cb_type.addItem("mysql8.0以下");
+        cb_type.addItem("mysql8.0以上");
+        this.getContentPane().add(cb_type);
         this.getContentPane().add(new JLabel("地址"));      
         text_url = new JTextField("127.0.0.1",10);
         this.getContentPane().add(text_url);
         this.getContentPane().add(new JLabel("端口"));      
-        text_port = new JTextField("1521",10);
+        text_port = new JTextField("1521",5);
         this.getContentPane().add(text_port);
         this.getContentPane().add(new JLabel("数据库名称"));     
-        text_name = new JTextField("orcl",10);
+        text_name = new JTextField("",6);
         this.getContentPane().add(text_name);
         this.getContentPane().add(new JLabel("用户名"));     
-        text_user = new JTextField("scott",10);
+        text_user = new JTextField("",9);
         this.getContentPane().add(text_user);
         this.getContentPane().add(new JLabel("密码"));   
-        text_pwd = new JPasswordField("tiger",10);
+        text_pwd = new JPasswordField("",9);
         this.getContentPane().add(text_pwd);
-
+                
         this.getContentPane().add(new JLabel("sql路径"));      //内容窗格添加组件
         text_sql=new JTextField(57);
         this.getContentPane().add(text_sql);
@@ -212,7 +250,7 @@ public class testf extends JFrame implements ActionListener {
 //				text_information.setText("该目录下有"+filelist.size()+"个文件");
 			}
 			//连接数据库
-			Connection conn=getConnection(db+dburl+":"+dbport+":"+dbname,dbuser,dbpwd);
+			Connection conn=getConnection(dburl,dbport,dbname,dbuser,dbpwd);
 			if (conn==null)
 				return ;
 			//存储执行的语句总个目和失败的个数
