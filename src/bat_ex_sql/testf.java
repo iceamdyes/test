@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 
 public class testf extends JFrame implements ActionListener {
-	//MySQL 8.0 ртоб
 	//©ь╪Ч
 	private JTextArea text_information;
 	private JPasswordField text_pwd;
