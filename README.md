@@ -1,5 +1,5 @@
 # 功能
-java读取sql文件到oracle中执行
+java读取sql文件到oracle或mysql中执行
 指定一个目录，读取其中的sql文件并执行，若sql语句中有clob数据，把对应的txt文件输入进去
 # 注意事项
 sql语句执行时出现中文乱码的情况
