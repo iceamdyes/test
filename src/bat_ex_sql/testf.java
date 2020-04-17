@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 
 public class testf extends JFrame implements ActionListener {
-	
 	//¿Ø¼þ
 	private JTextArea text_information;
 	private JPasswordField text_pwd;
