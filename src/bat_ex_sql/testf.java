@@ -273,7 +273,7 @@ public class testf extends JFrame implements ActionListener {
 					for(String sql:sqlArray)
 					{
 						try{
-							System.out.println(sql);//要执行的sql语句
+//							System.out.println(sql);//要执行的sql语句
 							if(sql.length()>1)//判断读取的SQL文件内容不是空的
 							{
 								sum++;
@@ -308,7 +308,7 @@ public class testf extends JFrame implements ActionListener {
 						        }
 							}
 						}catch (Exception ex){
-							ex.printStackTrace();
+//							ex.printStackTrace();
 							//把出错的SQL语句显示出来
 							text_information.setText(text_information.getText()+"\r\n"+sql+"执行失败\r\n"+"失败原因:"+ex.toString()+"\r\n");
 							//仅显示错误
