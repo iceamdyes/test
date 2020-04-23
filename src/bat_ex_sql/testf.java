@@ -257,6 +257,7 @@ public class testf extends JFrame implements ActionListener {
 			//遍历所有SQL文件，执行语句
 			try{
 				Statement st = conn.createStatement();
+				PreparedStatement stat,stat1;
 				//java不能将;当为结束符，需要以分号为间隔，单条执行语句
 				String allsql;
 				for(String file:filelist)
@@ -265,20 +266,24 @@ public class testf extends JFrame implements ActionListener {
 //					System.out.println(file);//sql文件地址
 					allsql =readFile(file,0);
 					String[] sqlArray= allsql.split(";");
+					Pattern pattern;
+					Matcher matcher;
+					int count=0;
+					conn.setAutoCommit(false);//不改成手动提交的话，好像还是一条一条执行
 					for(String sql:sqlArray)
 					{
 						try{
-//							System.out.println(sql);//要执行的sql语句
+							System.out.println(sql);//要执行的sql语句
 							if(sql.length()>1)//判断读取的SQL文件内容不是空的
 							{
 								sum++;
 								//匹配${*******}$判断有没有clob文件   .compile("\\$\\{.+(?:\\}\\$)");
 								//匹配dbvis***.txt把对应的txt文件存进去   .compile("dbvis.+(?:txt)");
-								Pattern pattern = Pattern.compile("dbvis.+(?:txt)");  
-						        Matcher matcher = pattern.matcher(sql);  
+								pattern = Pattern.compile("dbvis.+(?:txt)");  
+						        matcher = pattern.matcher(sql);  
 						        if (matcher.find()) {  
 						        	sql=sql.replaceAll("\\$\\{.+(?:\\}\\$)","?");
-						        	PreparedStatement stat = conn.prepareStatement(sql); 
+						        	stat = conn.prepareStatement(sql); 
 						        	File testFile = new File(clobpath+"\\"+matcher.group(0));
 						        	if(!testFile.exists())
 						        	{
@@ -287,38 +292,49 @@ public class testf extends JFrame implements ActionListener {
 						        		continue;
 						        	}
 						        	//以文件流的形式把clob数据存进去
-						            String clobContent=readFile(clobpath+"\\"+matcher.group(0),1);
+						            String clobContent=readFile(clobpath+"\\"+matcher.group(0),0);
 						            StringReader reader = new StringReader(clobContent);  
 						            stat.setCharacterStream(1, reader, clobContent.length());  
 						            stat.executeUpdate();
+						            
 						        }
-						        else{
-							       st.executeQuery(sql);
+						        else{//可以直接执行的sql语句可以使用批处理进行提交
+						        	count++;
+						        	st.addBatch(sql);
+						        	if(count%1000==0){
+										st.executeBatch();
+										count=0;
+										conn.commit();
+									}
 						        }
 							}
 						}catch (Exception ex){
-//							ex.printStackTrace();
+							ex.printStackTrace();
 							//把出错的SQL语句显示出来
-							text_information.setText(text_information.getText()+"\r\n"+sql+"执行失败\r\n"+"失败原因:"+ex.toString()+"\r\n"+error);
+							text_information.setText(text_information.getText()+"\r\n"+sql+"执行失败\r\n"+"失败原因:"+ex.toString()+"\r\n");
 							//仅显示错误
 //							text_information.setText(text_information.getText()+"\r\nSQL语句执行失败\r\n"+"失败原因:"+ex.toString());	
 							error++;//统计出错语句条数
 							continue ;
 						}
-//						
 					}
 					text_information.setText(text_information.getText()+"\r\n"+file+"执行结束");
 				}
+				st.executeBatch();
+				conn.commit();
+				conn.setAutoCommit(true);
 				conn.close();
 				st.close();
 			}catch (Exception ex){
-				//这里应该只能捕获到connection变量和statement变量的错误
+				//这里应该捕获到connection变量和statement变量的错误,或者最后一次批处理的错误
 				text_information.setText(text_information.getText()+"\r\n未定义的错误\r\n"+ex.toString());
 			}
 			//所有文件执行完毕
 			text_information.setText(text_information.getText()+"\r\n该目录下所有sql文件已执行完毕");
 			text_information.setText(text_information.getText()+"\r\n执行情况:总执行"+sum+"条，成功"+String.valueOf(sum-error)+"条，失败"+error+"条");
-			
+			Date date2 = new Date();
+			text_information.setText(text_information.getText()+"执行结束时间："+dateFormat.format(date2));
+			text_information.setText(text_information.getText()+"\r\n用时："+String.valueOf(date2.getTime()-date.getTime()));
 		}
 	}
 	public static void main(String[] args) {
