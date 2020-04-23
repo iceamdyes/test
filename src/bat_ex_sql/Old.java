@@ -319,8 +319,8 @@ public class Old extends JFrame implements ActionListener {
 			text_information.setText(text_information.getText()+"\r\n该目录下所有sql文件已执行完毕");
 			text_information.setText(text_information.getText()+"\r\n执行情况:总执行"+sum+"条，成功"+String.valueOf(sum-error)+"条，失败"+error+"条");
 			Date date2 = new Date();
-			text_information.setText(text_information.getText()+"执行结束时间："+dateFormat.format(date2));
-			text_information.setText(text_information.getText()+"\r\n用时："+String.valueOf(date2.getTime()-date.getTime()));
+			text_information.setText(text_information.getText()+"\r\n执行结束时间："+dateFormat.format(date2));
+			text_information.setText(text_information.getText()+"\r\n用时："+Integer.valueOf(String.valueOf(date2.getTime()-date.getTime()))/1000+"秒");
 		
 		}
 	}
