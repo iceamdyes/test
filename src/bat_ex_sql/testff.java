@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 
 
 
+
 import javax.sql.rowset.serial.SerialClob;
 import javax.swing.*;
 
@@ -191,20 +192,20 @@ public class testff extends JFrame implements ActionListener {
         text_name = new JTextField("orcl",6);
         this.getContentPane().add(text_name);
         this.getContentPane().add(new JLabel("用户名"));     
-        text_user = new JTextField("scott",9);
+        text_user = new JTextField("",9);
         this.getContentPane().add(text_user);
         this.getContentPane().add(new JLabel("密码"));   
-        text_pwd = new JPasswordField("tiger",9);
+        text_pwd = new JPasswordField("",9);
         this.getContentPane().add(text_pwd);
                 
         this.getContentPane().add(new JLabel("sql路径"));      //内容窗格添加组件
-        text_sql=new JTextField("D:\\360套装",57);
+        text_sql=new JTextField("",57);
         this.getContentPane().add(text_sql);
         button_sql=new JButton("设置sql路径");
         this.getContentPane().add(button_sql);
         button_sql.addActionListener(this);                //为按钮注册动作事件监听器
         this.getContentPane().add(new JLabel("txt数据路径"));      //内容窗格添加组件
-        text_txt=new JTextField("D:\\360套装\\dbscript",55);
+        text_txt=new JTextField("",55);
         this.getContentPane().add(text_txt);
         button_txt=new JButton("设置txt路径");
         this.getContentPane().add(button_txt);
@@ -499,8 +500,8 @@ public class testff extends JFrame implements ActionListener {
 			text_information.setText(text_information.getText()+"\r\n该目录下所有sql文件已执行完毕");
 			text_information.setText(text_information.getText()+"\r\n执行情况:总执行"+sum+"条，成功"+String.valueOf(sum-error)+"条，失败"+error+"条");
 			Date date2 = new Date();
-			text_information.setText(text_information.getText()+"执行结束时间："+dateFormat.format(date2));
-			text_information.setText(text_information.getText()+"\r\n用时："+String.valueOf(date2.getTime()-date.getTime()));
+			text_information.setText(text_information.getText()+"\r\n执行结束时间："+dateFormat.format(date2));
+			text_information.setText(text_information.getText()+"\r\n用时："+Integer.valueOf(String.valueOf(date2.getTime()-date.getTime()))/1000+"秒");
 		}
 	}
 	public static void main(String[] args) {
